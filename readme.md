@@ -8,19 +8,19 @@ client
 * gets an IP or hostname address to connect to as commandline argument, i. e.
 
 ```
-./client 127.0.0.1
+./client 127.0.0.1 6666
 ```
 
 or
 
 ```
-./client localhost
+./client localhost 6666
 ```
 
 or
 
 ```
-./client myserver.mydomain.am
+./client myserver.mydomain.am 6666
 ```
 
 * creates socket with socket()
