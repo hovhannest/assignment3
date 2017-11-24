@@ -69,3 +69,7 @@ references
 
 * http://beej.us/guide/bgnet/output/html/multipage/socketman.html
 
+deadline
+========
+
+Nov 27, 23:59
