@@ -3,6 +3,7 @@
 #include <string.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <arpa/inet.h>
 #include <unistd.h>
 
 #define VERBOS
@@ -21,7 +22,7 @@ int main(int argc, char* argv[])
 		int l = strlen(argv[1]);
 		dom = malloc(sizeof(char) * (l+1) );
 		strncpy(dom, argv[1], l);
-		char *port_str = argv[1];
+		char *port_str = argv[2];
 		port = atoi(port_str);
 	}
 	else
@@ -42,7 +43,7 @@ int main(int argc, char* argv[])
 		port = 8888;
 	}
 #ifdef VERBOS
-	printf("Client is started at %s:%d", dom, port);
+	printf("Client is started at %s:%d\n", dom, port);
 #endif
 
 	socket_desc = socket(AF_INET, SOCK_STREAM, 0);
@@ -53,13 +54,14 @@ int main(int argc, char* argv[])
 		exit(1);
 	}
 #ifdef VERBOS
-	printf("Socket created");
+	printf("Socket created\n");
+#endif
 
-	client.sin_adds.s_addr = inet_addr(dom);
+	client.sin_addr.s_addr = inet_addr(dom);
 	client.sin_family = AF_INET;
 	client.sin_port = htons(port);
 
-	if(connect(socket_desc, (struct sockaddr*)&client), sizeof(client) < 0)
+	if(connect(socket_desc, (struct sockaddr*)&client, sizeof(client)) < 0)
 	{
 		perror("Connect failed!");
 		free(dom);
@@ -67,6 +69,7 @@ int main(int argc, char* argv[])
 	}
 #ifdef VERBOS
 	printf("Connected\n");
+#endif
 
 	free(dom);
 	// keep alive
@@ -76,13 +79,48 @@ int main(int argc, char* argv[])
 
 		fgets(message, 2048, stdin);
 
-		if( send(socket, message, strlen(message), 0) < 0)
+		if( send(socket_desc, message, strlen(message), 0) < 0)
 		{
 			perror("Cannot send");
-			erit(1);		
+			exit(1);
 		}
 
-		//if( recv(sock, ))
+		memset(message, 0, 2048);
+		int recv_retval =  recv(socket_desc, message, 2048, 0 );
+		if( recv_retval < 0)
+		{
+#ifdef VERBOS
+			printf("recv failed\n");
+#endif
+			break;
+		}
+		else if (recv_retval == 0)
+		{
+#ifdef VERBOS
+			printf("connection closed\n");
+#endif
+			break;
+		}
+
+		printf("%s", message);
+
+		// Check if connection is closed (again;)
+		recv_retval = recv(socket_desc, message, 1, 0);
+		
+		if( recv_retval < 0)
+		{
+#ifdef VERBOS
+			printf("recv failed\n");
+#endif
+			break;
+		}
+		else if (recv_retval == 0)
+		{
+#ifdef VERBOS
+			printf("connection closed\n");
+#endif
+			break;
+		}
 	}
 
 	return 0;

@@ -83,18 +83,30 @@ while(1)
 	{
 		// assume we have a user with is 3322 with access to the network
 		setuid(3322);
+#ifdef VERBOS
+		printf("Client connected\n");
+#endif
+
 		//Get a message from client
 		int read_size = 0;
 		char client_message[2048];
 		while( (read_size = recv(client_desc, client_message, 2048, 0)) > 0 )
 		{
-			if(strcmp(client_message, "bye") == 0)
+			client_message[read_size] = 0;
+			if(client_message[0] ==  'b' && 
+				client_message[1] == 'y' && 
+				client_message[2] == 'e' && (client_message[3] == 0 || 
+					client_message[3] == '\n' ||
+					client_message[3] == '\r'))
 			{
-				write(client_desc, "Server is disconnected", 22);
+				write(client_desc, "Server is disconnected\n", 23);
+				shutdown(client_desc, SHUT_RDWR);
+				close(client_desc);
 				break;
 			}
 			else
 			{
+				printf("%s\n", client_message);
 				write(client_desc, client_message, read_size);
 			}
 		}
