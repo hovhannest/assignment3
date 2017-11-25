@@ -73,7 +73,7 @@ if(new_fd == -1)
 	{printf("accept failure call 911");close(sockfd); 
 	freeaddrinfo(res);	return 0;}
 // closing the port. optional. Remove if you accept more than one client
-close(sockfd);
+//close(sockfd);
 
 
 pid_t pid = fork();
@@ -82,6 +82,7 @@ if(pid ==0)
 while(1)
 
  { 
+	memset(&receivedMessage,0, sizeof(receivedMessage));
 	bytesRecv = recv(new_fd, receivedMessage,777,0);
 	if(bytesRecv == -1)
 	{		
@@ -100,7 +101,7 @@ while(1)
 		
 		if(compare_strings(receivedMessage,"bye",bytesRecv)==0)
 		{
-		write(new_fd, "The End", sizeof("The End"));
+		write(new_fd, "The End", 7);
 		write(1, "The End", sizeof("The End"));
 		printf("\n So long and thanks for all the fish");		
 		 fflush(stdout);
@@ -110,7 +111,7 @@ while(1)
 		}
 		else
 		{
-		write(new_fd, receivedMessage,strlen(receivedMessage));
+		send(new_fd, receivedMessage,strlen(receivedMessage),0);
 		write(1,receivedMessage,bytesRecv);
 		printf("\n");	
 		}

@@ -67,6 +67,8 @@ if(connect(sockfd, res->ai_addr, res->ai_addrlen)==-1)
 
 while(1)
 {
+	//server_message[0] = '\0';
+	memset(&server_message,0, sizeof(server_message));
 	scanf("%s", our_message);
 //	printf("%s", our_message);
 	//write(sockfd,our_message,strlen(our_message));
@@ -88,7 +90,7 @@ while(1)
 	//else if(intRecv == 0)
 	else if(compare_strings(server_message,"The End",7)==0)
 	{
-		printf(" Connection was terminated");
+		printf(" Connection was terminated \n");
 		freeaddrinfo(res); return 0;
 	}
 	else
