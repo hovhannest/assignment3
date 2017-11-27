@@ -43,7 +43,7 @@ int main(int argc, char** argv)
 	}
 	
 	while (1) {
-		printf("Your message : ");
+		write(1, "Your message : ", 15);
 		if (read(0, sendingLine, MAX_LINE_LENGTH) < 0) {
 			perror("Problem while reading from standard input");
 			exit(1);
@@ -67,5 +67,6 @@ int main(int argc, char** argv)
 		memset(sendingLine, 0, MAX_LINE_LENGTH);
 		memset(receivingLine, 0, MAX_LINE_LENGTH);
 	}
+	close(socketFD);
 	return 0;
 }

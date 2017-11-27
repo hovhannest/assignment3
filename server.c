@@ -8,24 +8,6 @@
 #define MAX_LINE_LENGTH 4096
 #define DEFAULT_SERVER_PORT 3000
 
-int compare_strings(char string1[], char string2[], int receivedCharacters) 
-{
-	int i = 0, count = 0;
-	while (string1[i] == string2[i] && ++count < receivedCharacters) {
-		if (string1[i] == '\0' || string2 == '\0') {
-			break;
-		}
-		i++;
-	}
-	if (count == receivedCharacters) {
-		return 0;
-	} else if (string1[i] == '\0' && string2[i] == '\0') {
-		return 0;
-	} else {
-		return -1;
-	}
-}
-
 int main(int argc, char** argv) 
 {
 	int listeningSocketFD, connSocketFD, n;
@@ -39,7 +21,7 @@ int main(int argc, char** argv)
 	serverAddress.sin_addr.s_addr = htonl(INADDR_ANY);
 	int port = DEFAULT_SERVER_PORT;
 	if (argc == 2) {
-		char* portNumber = argv[2];
+		char* portNumber = argv[1];
 		port = atoi(portNumber);
 	}
 	serverAddress.sin_port = htons(port);
@@ -64,14 +46,19 @@ int main(int argc, char** argv)
 
 		pid_t child_pid = fork();
 		if (child_pid == 0) {
-			while ((n = recv(connSocketFD, 
+			while (1){
+				n = recv(connSocketFD, 
 					readingBuffer, 
-					MAX_LINE_LENGTH, 0)))  {
-				
-				if (compare_strings(readingBuffer, "bye", n)==0){ 
+					MAX_LINE_LENGTH, 0);
+				if (n < 0) {
+					perror("Read error");
+					exit(1);
+				}
+
+				if (strcmp(readingBuffer, "bye")==0){ 
 					write(connSocketFD, 
 						"Server is disconnected", 
-						23);
+						22);
 					break;
 				}
 				printf("%s\n", "Message received from buffer.");
@@ -80,10 +67,6 @@ int main(int argc, char** argv)
 				memset(readingBuffer, 0, MAX_LINE_LENGTH);
 			}
 
-			if (n < 0) {
-				perror("Read error");
-				exit(1);
-			}
 			close(connSocketFD);
 			memset(readingBuffer, 0, MAX_LINE_LENGTH);
 		}
