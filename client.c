@@ -59,7 +59,7 @@ int main(int argc, char** argv)
 			exit(1);
 		}
 
-		if (strcmp(receivingLine, "Server is disconnected") == 0) {
+		if (strncmp(receivingLine, "Server is disconnected", 22) == 0) {
 			break;
 		}
 

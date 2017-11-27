@@ -55,7 +55,8 @@ int main(int argc, char** argv)
 					exit(1);
 				}
 
-				if (strcmp(readingBuffer, "bye")==0){ 
+				if (strncmp(readingBuffer, "bye", 3)==0){ 
+					write(1, "Server is disconnected", 22);
 					write(connSocketFD, 
 						"Server is disconnected", 
 						22);
