@@ -13,11 +13,13 @@ void error(const char *msg)
 }
 
 int main(int argc,char *argv[]){
- 	int sockfd,newsockfd,portno;
-	socklen_t_clilen;
+ 	int sockfd,newsockfd,portno,pid;
+	socklen_t clilen;
+	
 	char buffer[256];
+	
 	struct sockaddr_in serv_addr,cli_addr;
-	int n;
+	
 	if (argc<2){
 		fprintf(stderr,"Warning, NO port provided\n");
 
@@ -31,27 +33,54 @@ int main(int argc,char *argv[]){
 	portno=atoi(argv[1]);
 	serv_addr.sin_family=AF_INET;
 	serv_addr.sin_addr.s_addr=INADDR_ANY;
-	serv_addr.sin_port=htones(portno);
+	serv_addr.sin_port=htons(portno);
 	if(bind(sockfd,(struct sockadd *) &serv_addr,
 			sizeof(serv_addr))<0)
 			error("Warning on binding");
-	listen(sockfd,5);
+	listen(sockfd,2);
 	clilen= sizeof(cli_addr);
+	while(1){
 	newsockfd =accept(sockfd,(struct sockaddr *) &cli_addr,
 		&clilen);
 	if(newsockfd <0)
 		error("Warning on accept");
-	bzero(buffer,256);
-	n=read(newsockfd,buffer,255)
-	if(n<0) error("Warning reading from socket");
-	printf("Here is the message:%s\n",buffer);
-	n=write(newsockfd,"I receive your message",18);
-	if(n<0) error("Warning writing to socket");
-	close(newsockfd);
-	close(sockfd);
-	return 0;
-
+		pid= fork();
+	 	if(pid<0)
+		error("Warning on fork");
+		if(pid==0){
+	
+		dosmth(newsockfd);
+	
+		}
+	
+		}
+		close(sockfd);
+		return 0;
 }
 
+ 
+ void dosmth (int sock){
+ 	int n;
+	char buffer[256];
+	char cmp[3];
+	strcpy(cmp,"bye");
+	while(1)
+	{
+
+	bezero(buffer,256);
+	n=read(csock,buffer,255);
+
+	if(n<0) error("Warning reading from socket");
+	if(n<0) error("Warning write to socket");
+ 	{
+ 	break;
+ 	}
+ 
+ 	printf("Warning is the message:%s\n",buffer);
+	 n=write(csock,"I got your message\n",24);
+	 if(n<0) error("Warning writing to socket");
+	 };
+	 close(csock);
+ }
 
 

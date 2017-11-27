@@ -13,7 +13,9 @@ void error(const char *msg){
 	exit(0);
 }
 
-int main(int argc,char *argv[]){
+int main(int argc,char *argv[])
+{
+    
     int sockfd,portno,n;
     struct sockaddr_in serv_addr;
     struct hostent *server;
@@ -43,27 +45,20 @@ int main(int argc,char *argv[]){
 
 		error("Waring connecting");
 		printf("please enter the massage: ");
+		while(1){
 		bzero(buffer,256);
 		fgets(buffer,255,stdin);
 		n=write(sockfd,buffer,strlen(buffer));
-	if(n<0)
-	       error("Warning writing to socket");
+
+		if(n<0)
+	       		error("Warning writing to socket");
 	bzero(buffer,256);
 	n=read(sockfd,buffer,255);
 	if(n<0)
 	      error("Warning reading from socket")
 	 printf("%s\n",buffer);
+	 }
 	 close(sockfd);
 	 return 0;
-		n=write(sockfd,buffer,strlen(buffer));
-		if(n<0)
-			error("Warning writing to socket");
-		bzero(buffer,256);
-		n=read(sockfd,buffer,255);
-		if(n<0)
-		  error("Warning reading from socket");
-		  printf("%s\n",buffer);
-		  close(sockfd);
-		  return 0;
-    
+	
     }
