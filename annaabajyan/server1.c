@@ -1,40 +1,50 @@
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
 #include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <errno.h>
-#include <string.h>
+#include <sys/socket.h>
 #include <sys/types.h>
+#include <netinet/in.h>
+#include <stdlib.h>
 
-int main(void)
-{
-int listenfd = 0, connfd = 0;
-struct sockaddr_in serv_addr;
-char sendBuff[1025];
-int numrv;
-
-listenfd = socket(AF_INET, SOCK_STREAM, 0);
-printf("socket retrieve success\n");
-
-memset(&serv_addr, '0', sizeof(serv_addr));
-memset(sendBuff, '0', sizeof(sendBuff));
-serv_addr.sin_family = AF_INET;
-serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
-serv_addr.sin_port = htons(5000);
-bind(listenfd, (struct sockaddr*)&serv_addr,sizeof(serv_addr));
-
-if (listen(listenfd, 10) == -1){
-printf("Failed to listen\n");
-return -1;
+void str_echo(int s){
+char buf[50];
+//receiving data from client
+recv(s,buf,50,0);
+puts("Message from Client...");
+fputs(buf,stdout);
+send(s,buf,50,0);
 }
-while(1){
-connfd = accept(listenfd, (struct sockaddr*)NULL, NULL);
-strcpy(sendBuff, "Message from server");
-write(connfd, sendBuff, strlen(sendBuff));
-close(connfd);
-sleep(1);
+int main(){
+int ls,cs,len;
+struct sockaddr_in serv, cli;
+pid_t pid;
+puts("I am Server...");
+//creating socket
+ls = socket(AF_INET,SOCK_STREAM,0);
+puts("Socket Created Successfully..");
+//socket address structure
+serv.sin_family = AF_INET;
+serv.sin_addr.s_addr = INADDR_ANY;
+serv.sin_port = htons(5000);
+
+bind(ls,(struct sockaddr*) &serv, sizeof(serv));
+puts("Binding Done...");
+
+listen(ls,3);
+puts("Listening for Client...");
+
+for(;;){
+len = sizeof(cli);
+//accepting client connection
+cs = accept(ls,(struct sockaddr*) &cli,&len);
+puts("\nConnected to Client...");
+//creating child process
+if((pid = fork()) == 0){
+puts("Child process created...");
+close(ls);
+str_echo(cs);
+close(cs);
+exit(0);
+}
+close(cs);
 }
 return 0;
 }
