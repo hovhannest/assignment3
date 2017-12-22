@@ -82,6 +82,7 @@ if(pid ==0)
 while(1)
 
  { 
+  printf("server forked\n");
 	memset(&receivedMessage,0, sizeof(receivedMessage));
 	bytesRecv = recv(new_fd, receivedMessage,777,0);
 	if(bytesRecv == -1)
